@@ -1,0 +1,68 @@
+version: '3.8'
+name: test
+services:
+  faust:
+    image: test-faust:latest
+    build:
+      context: .
+    restart: "no"
+    command: sh -c "
+      sh /workdir/wait-for.sh redpanda:29092 --timeout=20
+        && faust -A app worker -l info"
+    deploy:
+      replicas: 3
+    environment:
+      FAUST_BROKER_URL: "kafka://redpanda:29092"
+      TOPIC_PARTITIONS: 3
+
+    volumes:
+      - ./app:/code/app
+    networks:
+      - test_network
+    depends_on:
+    - redpanda
+
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:latest
+    command:
+      - redpanda start
+      - --smp 1
+      - --overprovisioned
+      - --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092
+      - --pandaproxy-addr 0.0.0.0:8082
+      - --advertise-pandaproxy-addr localhost:8082
+    volumes:
+      - redpanda:/var/lib/redpanda/data
+    networks:
+      - test_network
+
+  console:
+    image: docker.redpanda.com/redpandadata/console:v2.1.1
+    entrypoint: /bin/sh
+    command: -c "echo \"$$CONSOLE_CONFIG_FILE\" > /tmp/config.yml; /app/console"
+    environment:
+      CONFIG_FILEPATH: /tmp/config.yml
+      CONSOLE_CONFIG_FILE: |
+        kafka:
+          brokers: ["redpanda:29092"]
+          schemaRegistry:
+            enabled: true
+            urls: ["http://redpanda:8081"]
+        redpanda:
+          adminApi:
+            enabled: true
+            urls: ["http://redpanda:9644"]
+    ports:
+      - "8080:8080"
+    networks:
+      - test_network
+    depends_on:
+      - redpanda
+
+networks:
+  test_network:
+    driver: bridge
+
+volumes:
+  redpanda: null

@@ -1,0 +1,12 @@
+faust-streaming
+ib_insync
+pytest
+pytest-mock
+pytest-asyncio
+pytest-aiohttp
+asynctest
+slack_sdk
+yliveticker
+protobuf==3.20.0
+websockets==11.0
+logfmter
