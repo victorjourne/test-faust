@@ -22,9 +22,9 @@ docker compose exec faust curl -X POST localhost:6066/info -H 'Content-Type: app
 
 ## Observe it
 
-![Screenshot of Redpanda Console](images/Screenshot test-info-changelog - Redpanda Console.png)
+![Screenshot of Redpanda Console](images/Screenshot_test-info-changelog_Redpanda_Console.png)
 
-![Screenshot of docker logs](images/Screenshot docker logs.png)
+![Screenshot of docker logs](images/Screenshot_docker_logs.png)
 
 ```bash
 docker ps --format "table {{.ID}}\t{{.Names}}"
