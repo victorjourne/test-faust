@@ -7,7 +7,7 @@ app = faust.App(
     'test',
     debug=False,
     broker=os.getenv("FAUST_BROKER_URL"),
-    topic_partitions=int(os.getenv("NB_PARTITIONS", 1)),
+    topic_partitions=int(os.getenv("TOPIC_PARTITIONS", 1)),
     value_serializer='json'
 )
 
